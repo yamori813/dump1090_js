@@ -4,20 +4,10 @@
     <meta charset="UTF-8">
     <title>DUMP1090</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.0/dist/leaflet.css" />
-    <script src="http://10.0.1.18/js/jquery.min.js">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
     </script>
     <script src="https://unpkg.com/leaflet@1.3.0/dist/leaflet.js"></script>
-    <style>
-        /*黄色のアイコンのCSS  */
-        .icon1 {
-            width: 14px !important;
-            height: 14px !important;
-            border-radius: 10px;
-            border: 1px solid #fdfdfd;
-            box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-            background-color: rgb(255, 255, 0);
-        }
-    </style>
+    <script src="http://10.0.1.18/js/leaflet.rotatedMarker.js"></script>
     <script>
 	lat=35.65;
 	lon=139.69;
@@ -26,10 +16,10 @@
         function init() {
             map = L.map('mapcontainer');
             map.setView([lat, lon], 10);
-            L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+            L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
                 attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>"
             }).addTo(map);
-            window.setInterval(function() {
+			window.setInterval(function() {
                 fetchData();
             }, 1000);
         }
@@ -42,14 +32,16 @@
                     stillhere[plane.hex] = true;
                     plane.flight = $.trim(plane.flight);
                     if (Planes[plane.hex]) {
+                        Planes[plane.hex].marker.setRotationAngle(plane.track);
                         Planes[plane.hex].marker.setTooltipContent(plane.flight);
                         Planes[plane.hex].marker.setLatLng([plane.lat, plane.lon]);
+						Planes[plane.hex].marker.flight=plane.flight;
                     } else {
+			var myIcon1 = L.divIcon({ className: 'icon3', iconAnchor: [14, 14], html:'<div style="text-align: center"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 512 512" style="background-color: transparent;fill: rgb(70,70,70);"><path d="M456.2,318.9l22-62.7-98.4-33.7V184.6H339.3v24l-27.7-9.4c-2.7-68.4-14.1-127.5-32.1-152.3-6.5-9-16.1-9.4-23.5-9.4h-.1c-7.4,0-17,.4-23.5,9.4-17.9,24.8-29.4,83.9-32.1,152.3l-27.6,9.4v-24H132.2v37.9L33.7,256.2l22,62.7,146.4-28.1c4.8,56.4,15.9,100.7,27,141l-32.7,29.1,10.6,19,48.9-24.8h.1l48.9,24.8,10.6-19-32.7-29.1c11.1-40.3,22.2-84.6,27-141Z"/></svg></div>'});
                         Planes[plane.hex] = plane;
-                        var myIcon1 = L.divIcon({ className: 'icon1', iconAnchor: [13, 13] });
-                        Planes[plane.hex].marker = L.marker([plane.lat, plane.lon], { icon: myIcon1 });
-                        Planes[plane.hex].marker.addTo(map).bindTooltip(plane.flight);
-;
+                        Planes[plane.hex].marker = L.marker([plane.lat, plane.lon], { icon: myIcon1, rotationAngle: plane.track});
+						Planes[plane.hex].marker.flight=plane.flight;
+                        Planes[plane.hex].marker.addTo(map).bindTooltip(plane.flight).on( 'click', function(e) {  clickEvt(e); });
                     }
                 }
                 /* Remove idle planes. */
@@ -61,6 +53,11 @@
                 }
             });
         }
+		function clickEvt(e){
+			if (e.target.flight) {
+				window.open('https://ja.flightaware.com/live/flight/' + e.target.flight);
+			}
+		}
     </script>
 </head>
 <body onload="init()">
