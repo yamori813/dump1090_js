@@ -71,7 +71,7 @@
                         Planes[plane.hex] = plane;
                         Planes[plane.hex].marker = L.marker([plane.lat, plane.lon], { icon: myIcon1, rotationAngle: plane.track});
 						Planes[plane.hex].marker.hex=plane.hex;
-                        Planes[plane.hex].marker.addTo(map).bindTooltip(plane.flight).on( 'click', function(e) {clickEvt(e); }).on('mouseover', function(e) {Selected=e;}).on('mouseout', function(e) {Selected=null;});
+                        Planes[plane.hex].marker.addTo(map).bindTooltip(plane.flight).on( 'click', function(e) {clickEvt(e); }).on('mouseover', function(e) {Selected=e;}).on('mouseout', function(e) {Selected=null;info.update();});
                     }
                 }
                 /* Remove idle planes. */
@@ -81,7 +81,9 @@
                         delete Planes[p];
                     }
                 }
-				info.update();
+				if (Selected) {
+					info.update();
+				}
             });
         }
 		function clickEvt(e){
