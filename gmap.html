@@ -25,6 +25,7 @@
 		<script>
 	lat=35.65;
 	lon=139.69;
+			zoom=9;
 			altitude=0.0;
         map=null;
 		info=null;
@@ -34,7 +35,7 @@
 			var hour, min, sec;
         function init() {
             map = L.map('mapcontainer');
-            map.setView([lat, lon], 10);
+            map.setView([lat, lon], zoom);
             L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
                 attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>"
             }).addTo(map);
