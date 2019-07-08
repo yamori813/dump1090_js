@@ -13,6 +13,10 @@
             width: 600px;
             height: 400px;
         }
+		.clock {
+				color: #000;
+				background-color: transparent;
+		}
     </style>
 
     <style>#map { width: 800px; height: 500px; }
@@ -26,6 +30,8 @@
 		info=null;
         Planes={};
 		Selected=null;
+			var yearSpan, monthSpan, daySpan, hourSpan, minSpan, secSpan, now;
+			var hour, min, sec;
         function init() {
             map = L.map('mapcontainer');
             map.setView([lat, lon], 10);
@@ -46,12 +52,48 @@
 				}
 			};
 			info.addTo(map);
+			var clock = L.control({position: 'bottomleft'});
+clock.onAdd = function (map) {
+var div = L.DomUtil.create('div', 'info clock');
+			div.innerHTML = '<span id="year">00</span>/<span id="month">00</span>/<span id="day">00</span> <span id="hour">00</span>:<span id="min">00</span>:<span id="sec">00</span>';
+return div;
+			}
+			clock.addTo(map);
+			yearSpan=document.getElementById("year");
+			monthSpan=document.getElementById("month");
+			daySpan=document.getElementById("day");
+			hourSpan=document.getElementById("hour");
+			minSpan=document.getElementById("min");
+			secSpan=document.getElementById("sec");
+
+			L.control.scale().addTo(map);
 
 			window.setInterval(function() {
+			Clock();
                 fetchData();
             }, 1000);
         }
-        function fetchData() {
+
+		function Clock(){
+			now=new Date();
+			hour=now.getHours();
+			min=now.getMinutes();
+			sec=now.getSeconds();
+
+			if(hour<10)  hour="0" +hour;
+			if(min<10)  min="0" +min;
+			if(sec<10)  sec="0" +sec;
+
+			hourSpan.innerHTML=hour;
+			minSpan.innerHTML=min;
+			secSpan.innerHTML=sec;
+
+			yearSpan.innerHTML=now.getFullYear();
+			monthSpan.innerHTML=now.getMonth()+1;
+			daySpan.innerHTML=now.getDate();
+		}
+
+			function fetchData() {
             $.getJSON('/data.json', function(data) {
                 var stillhere = {}
                 for (var j=0; j < data.length; j++) {
