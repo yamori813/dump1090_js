@@ -10,4 +10,4 @@ lat,lonが中心座標なので、適宜修正してください。
 
 アイコンはペンタラボさんの素材を使わせてもらいました。
 
-![サンプル](https://github.com/yamori813/dump1090_js/sample.png)
+![サンプル](https://github.com/yamori813/dump1090_js/blob/master/sample.png)
