@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <title>DUMP1090</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.0/dist/leaflet.css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
-    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.3.0/dist/leaflet.js"></script>
-    <script src="http://10.0.1.18/js/leaflet.rotatedMarker.js"></script>
+    <script src="https://unpkg.com/leaflet-rotatedmarker@0.2.0/leaflet.rotatedMarker.js"></script>
 <style>
         #map {
             width: 600px;
@@ -23,6 +22,10 @@
 .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
 .legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }</style>
 		<script>
+// Tokyo Metropolitan Government Building
+	orglat = 35.6895014;
+	orglon = 139.6917337;
+
 	lat=35.65;
 	lon=139.69;
 			zoom=9;
@@ -47,7 +50,17 @@
 			};
 			info.update = function () {
 				if (Selected) {
-			this._div.innerHTML = '<h4>airplane information</h4>' + '<b>' + Planes[Selected.target.hex].flight + '</b><br>altitude: ' + String(Planes[Selected.target.hex].altitude) + ' ft<br>speed: ' + String(Planes[Selected.target.hex].speed + ' kts');
+					const R = Math.PI / 180;
+					lat1 = Planes[Selected.target.hex].lat;
+					lon1 = Planes[Selected.target.hex].lon;
+					lat2 = orglat;
+					lon2 = orglon;
+					lat1 *= R;
+					lon1 *= R;
+					lat2 *= R;
+					lon2 *= R;
+					distan = Math.round(6371 * Math.acos(Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1) + Math.sin(lat1) * Math.sin(lat2)) * 0.539957);
+			this._div.innerHTML = '<h4>airplane information</h4>' + '<b>' + Planes[Selected.target.hex].flight + '</b><br>altitude: ' + String(Planes[Selected.target.hex].altitude) + ' ft<br>speed: ' + String(Planes[Selected.target.hex].speed + ' kts<br>distance: ' + distan + ' nm');
 				} else {
 					this._div.innerHTML = '<h4>airplane information</h4>' + 'mouse over marker';
 				}
@@ -109,6 +122,8 @@ return div;
 						Planes[plane.hex].flight = plane.flight;
 						Planes[plane.hex].altitude = plane.altitude;
 						Planes[plane.hex].speed = plane.speed;
+						Planes[plane.hex].lat = plane.lat;
+						Planes[plane.hex].lon = plane.lon;
                     } else {
 			var myIcon1 = L.divIcon({ className: 'icon3', iconAnchor: [14, 14], html:'<div style="text-align: center"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 512 512" style="background-color: transparent;fill: rgb(70,70,70);"><path d="M456.2,318.9l22-62.7-98.4-33.7V184.6H339.3v24l-27.7-9.4c-2.7-68.4-14.1-127.5-32.1-152.3-6.5-9-16.1-9.4-23.5-9.4h-.1c-7.4,0-17,.4-23.5,9.4-17.9,24.8-29.4,83.9-32.1,152.3l-27.6,9.4v-24H132.2v37.9L33.7,256.2l22,62.7,146.4-28.1c4.8,56.4,15.9,100.7,27,141l-32.7,29.1,10.6,19,48.9-24.8h.1l48.9,24.8,10.6-19-32.7-29.1c11.1-40.3,22.2-84.6,27-141Z"/></svg></div>'});
                         Planes[plane.hex] = plane;
@@ -134,6 +149,7 @@ return div;
 				window.open('https://ja.flightaware.com/live/flight/' + Planes[e.target.hex].flight);
 			}
 		}
+
     </script>
 </head>
 <body onload="init()">
